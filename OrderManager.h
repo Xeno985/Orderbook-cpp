@@ -1,228 +1,70 @@
 
-#include<map>
+#include <map>
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 
-
 // OrderManager class
-class OrderManager {
+class OrderManager
+{
 private:
     std::unordered_map<std::string, Order> orders;
-    client* wsClient;
+    client *wsClient;
     websocketpp::connection_hdl wsHandle;
 
-    bool orderExists(const std::string& orderId) const {
+    bool orderExists(const std::string &orderId) const
+    {
         return orders.find(orderId) != orders.end();
     }
 
-    void sendApiRequest(const std::string& requestJson);
+    void sendApiRequest(const std::string &requestJson);
 
 public:
-    OrderManager(client* clientPtr, websocketpp::connection_hdl hdl);
+    OrderManager(client *clientPtr, websocketpp::connection_hdl hdl);
 
-    bool placeOrder(const Order& order);
+    bool placeOrder(const Order &order);
 
-    bool cancelOrder(const std::string& orderId);
+    bool cancelOrder(const std::string &orderId);
 
-    bool modifyOrder(const std::string& orderId, const std::optional<double>& newPrice, const std::optional<double>& newAmount, std::string& advanced,bool& post_only,bool& reduce_only);
-    void handleApiResponse(const std::string& response);
+    bool modifyOrder(const std::string &orderId, const std::optional<double> &newPrice, const std::optional<double> &newAmount, std::string &advanced, bool &post_only, bool &reduce_only);
+    void handleApiResponse(const std::string &response);
 
-    std::optional<Order> getOrderById(const std::string& orderId) const {
-        if (!orderExists(orderId)) {
-            return std::nullopt;
-        }
-        return orders.at(orderId);
-    }
+    std::optional<Order> getOrderById(const std::string &orderId) const;
 
-    std::vector<Order> getAllOrders() const {
-        std::vector<Order> allOrders;
-        for (const auto& pair : orders) {
-            allOrders.push_back(pair.second);
-        }
-        return allOrders;
-    }
+    std::vector<Order> getAllOrders() const;
 
-    std::unordered_map<std::string, double> getCurrentPositions() const {
-        std::unordered_map<std::string, double> positions;
-        for (const auto& pair : orders) {
-            const Order& order = pair.second;
-            if (order.side == "buy") {
-                positions[order.instrumentName] += order.amount;
-            } else if (order.side == "sell") {
-                positions[order.instrumentName] -= order.amount;
-            }
-        }
-        return positions;
-    }
+    std::unordered_map<std::string, double> getCurrentPositions() const;
 
-    bool processApiResponse(const std::string& response) {
-        try {
-            auto jsonResponse = nlohmann::json::parse(response);
-
-            if (jsonResponse.contains("result")) {
-                auto result = jsonResponse["result"];
-                if (result.contains("order")) {
-                    auto orderId = result["order"]["order_id"].get<std::string>();
-                    auto orderIt = orders.find(orderId);
-                    if (orderIt == orders.end()) {
-                        return false;
-                    }
-                    Order& order = orderIt->second;
-
-                    // Handle null values gracefully
-                    auto orderTypeStr = result["order"]["order_type"].get<std::string>();
-                    OrderType orderType = stringToOrderType(orderTypeStr.empty() ? "limit" : orderTypeStr); // Default to "limit" if null
-
-                    // Update existing order
-                    order.price = result["order"]["average_price"].get<double>();
-                    order.amount = result["order"]["amount"].get<double>();
-                    order.side = result["order"]["direction"].get<std::string>();
-                    order.label = result["order"]["label"].get<std::string>();
-
-                    // Add trades to the order
-                    if (result.contains("trades")) {
-                        for (const auto& tradeJson : result["trades"]) {
-                            Trade trade{
-                                tradeJson["trade_id"].get<std::string>(),
-                                tradeJson["price"].get<double>(),
-                                tradeJson["amount"].get<double>(),
-                                tradeJson["fee"].get<double>(),
-                                tradeJson["fee_currency"].get<std::string>(),
-                                tradeJson["direction"].get<std::string>(),
-                                tradeJson["timestamp"].get<int64_t>()
-                            };
-                            order.addTrade(trade);
-                        }
-                    }
-
-                    std::cout << "Order " << orderId << " updated with new trades.\n";
-                    return true;
-                }
-            }
-        } catch (const nlohmann::json::exception& e) {
-            std::cerr << "JSON parsing error: " << e.what() << std::endl;
-        }
-        return false;
-    }
+    bool processApiResponse(const std::string &response);
 
     //  method: Get order history by currency
-    void getOrderHistoryByCurrency(const std::string& currency) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "private/get_order_history_by_currency"},
-            {"params", {
-                {"currency", currency},
-                {"count", 10}  // Number of orders to retrieve
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void getOrderHistoryByCurrency(const std::string &currency);
 
     //  method: Get order history by instrument
-    void getOrderHistoryByInstrument(const std::string& instrument) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "private/get_order_history_by_instrument"},
-            {"params", {
-                {"instrument_name", instrument},
-                {"count", 10}  // Number of orders to retrieve
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void getOrderHistoryByInstrument(const std::string &instrument);
 
     //  method: Stream market data
-    void streamMarketData(const std::string& channel) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "public/subscribe"},
-            {"params", {
-                {"channels", {channel}}
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void streamMarketData(const std::string &channel);
 
     //  method: Get summary by instrument
-    void getSummaryByInstrument(const std::string& instrument) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "public/get_book_summary_by_instrument"},
-            {"params", {
-                {"instrument_name", instrument}
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void getSummaryByInstrument(const std::string &instrument);
 
     //  method: Get summary by currency
-    void getSummaryByCurrency(const std::string& currency) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "public/get_book_summary_by_currency"},
-            {"params", {
-                {"currency", currency}
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void getSummaryByCurrency(const std::string &currency);
 
     //  method: Get ticker data
-    void getTickerData(const std::string& instrument) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "public/ticker"},
-            {"params", {
-                {"instrument_name", instrument}
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void getTickerData(const std::string &instrument);
 
     //  method: Get contract size
-    void getContractSize(const std::string& instrument) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "public/get_instrument"},
-            {"params", {
-                {"instrument_name", instrument}
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void getContractSize(const std::string &instrument);
 
     //  method: Get all supported currencies
-    void getAllSupportedCurrencies() {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "public/get_currencies"}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void getAllSupportedCurrencies();
 
     //  method: Subscribe to a channel
-    void subscribe(const std::string& channel) {
-        nlohmann::json requestJson = {
-            {"jsonrpc", "2.0"},
-            {"id", std::rand()},
-            {"method", "public/subscribe"},
-            {"params", {
-                {"channels", {channel}}
-            }}
-        };
-        sendApiRequest(requestJson.dump());
-    }
+    void subscribe(const std::string &channel);
 
     // New method: Unsubscribe from a channel
-    void unsubscribe(const std::string& channel);
+    void unsubscribe(const std::string &channel);
 
     // New method: Unsubscribe from all channels
     void unsubscribeAll();
