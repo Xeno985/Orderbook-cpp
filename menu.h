@@ -1,7 +1,7 @@
 #include<iostream>
 #include "OrderManager.h"
-#include "ftxui/component/component.hpp"
-#include "ftxui/component/screen_interactive.hpp"
+#include "FTXUI/include/ftxui/component/component.hpp"
+#include "FTXUI/include/ftxui/component/screen_interactive.hpp"
 // Menu interface
 class Menu{
     public:

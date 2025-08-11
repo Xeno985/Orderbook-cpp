@@ -13,7 +13,7 @@
 #include "Authenticator.h"
 #include "types.hpp"
 #include "OrderManager.h"
-
+#include "menu.h"
 
 // Typedefs and using declarations
 typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
