@@ -20,5 +20,30 @@ ftxui::Component PortfolioTracker::CreateMainLayout(){
             portfolioTracker,
             orderPanel
         }
+    );
+
+    return Renderer(mainLayout,[&]{
+        return hbox(
+            {
+                portfolioTracker-> Render()|flex,
+                separator(),
+                orderPanel-> Render()|flex
+            }
+        )|border;
+    }
+);
+
+}
+
+ftxui::Component PortfolioTracker::CreatePortfolioTracker(){
+    return Renderer(
+        [&]{
+            if(!_manager){
+                return text("OrderManager not initialized")|color(ftxui::Color::Red)|center;
+            }
+
+            auto positions= _manager-> getCurrentPositions();
+        }
+        ftxui::Elements rows;
     )
 }

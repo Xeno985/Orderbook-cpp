@@ -5,7 +5,7 @@
 #include<vector>
 #include<string>
 #include<map>
-
+#include "FTXUI/include/ftxui/dom/elements.hpp"
 //position object to bundle params together
 struct Position{
     std::string instrument;
