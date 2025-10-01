@@ -3,6 +3,8 @@
 #include<vector>
 #include<optional>
 #include<sstream>
+#include "types.hpp"
+#include "common.h"
 class Order {
 private:
     std::string id;                        // Unique order identifier
@@ -17,9 +19,7 @@ private:
     std::optional<std::string> label;      // Optional order label
     std::vector<Trade> trades;  
 
-    static std::vector<std::string> tokenize(const std::string& str, char delimiter) {
-
-    }
+    static std::vector<std::string> tokenize(const std::string& str, char delimiter);
 
 public:
  
@@ -44,7 +44,7 @@ Order(
 
     friend class OrderManager;
 
-    static Order fromSimpleString(const std::string& input) {}
+    static Order fromSimpleString(const std::string& input);
 
     const std::string& getInstrumentName() const { return instrumentName; }
     double getAmount() const { return amount; }

@@ -10,6 +10,8 @@
 #include <optional>
 #include <unordered_map>
 #include <vector>
+#include "common.h"
+
 class Authenticator {
 private:
     const std::string client_id = get_client_id();
@@ -38,7 +40,7 @@ private:
     }
 
 public:
-  Authenticator(){}
+  Authenticator();
 
-  void send_authcall(client* c,websocketpp:connection_hdl hdl){}
+  void send_authcall(client* c,websocketpp::connection_hdl hdl);
 };

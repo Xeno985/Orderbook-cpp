@@ -12,7 +12,6 @@
 #include "Order.h"
 #include "Authenticator.h"
 #include "types.hpp"
-#include "OrderManager.h"
 #include "menu.h"
 
 // Typedefs and using declarations
@@ -113,7 +112,7 @@ int main(int argc, char* argv[]) {
     client c;
     std::string hostname = "test.deribit.com/ws/api/v2";
     std::string uri = "wss://" + hostname;
-
+    Menu menu;
     try {
         c.set_access_channels(websocketpp::log::alevel::all);
         c.clear_access_channels(websocketpp::log::alevel::frame_payload);
@@ -142,74 +141,82 @@ int main(int argc, char* argv[]) {
             std::unique_lock<std::mutex> lock(mtx);
             cv.wait(lock, [] { return connectionOpen; });
             lock.unlock();
+            
+            menu.showInteractiveMenu(manager);
+            websocketpp::lib::error_code ec;
 
-            while (true) {
-                displayMenu();
-                int choice;
-                std::cin >> choice;
-                switch (choice) {
-                    case 1:
-                        placeOrderMenu(manager);
-                        break;
-                    case 2:
-                        cancelOrderMenu(manager);
-                        break;
-                    case 3:
-                        modifyOrderMenu(manager);
-                        break;
-                    case 4:
-                        viewPositionsMenu(manager);
-                        break;
-                    case 5:
-                        getOrderHistoryByCurrencyMenu(manager);
-                        break;
-                    case 6:
-                        getOrderHistoryByInstrumentMenu(manager);
-                        break;
-                    case 7:
-                        streamMarketDataMenu(manager);
-                        break;
-                    case 8:
-                        getSummaryByInstrumentMenu(manager);
-                        break;
-                    case 9:
-                        getSummaryByCurrencyMenu(manager);
-                        break;
-                    case 10:
-                        getTickerDataMenu(manager);
-                        break;
-                    case 11:
-                        getContractSizeMenu(manager);
-                        break;
-                    case 12:
-                        getAllSupportedCurrenciesMenu(manager);
-                        break;
-                    case 13:
-                        subscribeMenu(manager);
-                        break;
-                    case 14:
-                        unsubscribeMenu(manager);
-                        break;
-                    case 15:
-                        unsubscribeAllMenu(manager);
-                        break;
-                    case 16:
-                        std::cout << "Exiting...\n";
-                        return 0;
-                    default:
-                        std::cout << "Invalid choice. Please try again.\n";
-                }
+            c.stop();
+            // while (true) {
+            //     menu.displayMenu();
+            //     int choice;
+            //     std::cin >> choice;
+            //     switch (choice) {
+            //         case 1:
+            //             menu.placeOrderMenu(manager);
+            //             break;
+            //         case 2:
+            //             menu.cancelOrderMenu(manager);
+            //             break;
+            //         case 3:
+            //             menu.modifyOrderMenu(manager);
+            //             break;
+            //         case 4:
+            //             menu.viewPositionsMenu(manager);
+            //             break;
+            //         case 5:
+            //             menu.getOrderHistoryByCurrencyMenu(manager);
+            //             break;
+            //         case 6:
+            //             menu.getOrderHistoryByInstrumentMenu(manager);
+            //             break;
+            //         case 7:
+            //             menu.streamMarketDataMenu(manager);
+            //             break;
+            //         case 8:
+            //             menu.getSummaryByInstrumentMenu(manager);
+            //             break;
+            //         case 9:
+            //             menu.getSummaryByCurrencyMenu(manager);
+            //             break;
+            //         case 10:
+            //             menu.getTickerDataMenu(manager);
+            //             break;
+            //         case 11:
+            //             menu.getContractSizeMenu(manager);
+            //             break;
+            //         case 12:
+            //             menu.getAllSupportedCurrenciesMenu(manager);
+            //             break;
+            //         case 13:
+            //             menu.subscribeMenu(manager);
+            //             break;
+            //         case 14:
+            //             menu.unsubscribeMenu(manager);
+            //             break;
+            //         case 15:
+            //             menu.unsubscribeAllMenu(manager);
+            //             break;
+            //         case 16:
+            //             std::cout << "Exiting...\n";
+            //             return 0;
+            //         default:
+            //             std::cout << "Invalid choice. Please try again.\n";
+            //     }
 
-                if (manager == nullptr) {
-                    std::cerr << "Connection closed. Exiting menu." << std::endl;
-                    break;
-                }
-            }
-            return 0;
+            //     if (manager == nullptr) {
+            //         std::cerr << "Connection closed. Exiting menu." << std::endl;
+            //         break;
+            //     }
+            // }
+            // return 0;
         });
 
         c.run();
         menuThread.join();
+        if (manager) {
+    delete manager;
+    manager = nullptr;
+}
     } catch (websocketpp::exception const& e) {
         std::cout << "WebSocket Exception: " << e.what() << std::endl;
     }

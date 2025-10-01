@@ -56,10 +56,10 @@ Order Order::fromSimpleString(const std::string& input){
         const std::string& orderSide,
         const std::string& orderTypeStr,  // Change to string
         double orderAmount,
-        std::optional<double> orderPrice = std::nullopt,
-        std::optional<double> orderTriggerPrice = std::nullopt,
-        std::optional<std::string> orderTrigger = std::nullopt,
-        std::optional<std::string> orderLabel = std::nullopt
+        std::optional<double> orderPrice,
+        std::optional<double> orderTriggerPrice,
+        std::optional<std::string> orderTrigger,
+        std::optional<std::string> orderLabel
     ) : id(orderId),
         instrumentName(instrument),
         instrumentType(instrType),

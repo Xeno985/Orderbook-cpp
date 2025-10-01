@@ -2,7 +2,9 @@
 #include <map>
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
-
+#include <nlohmann/json.hpp>
+#include "Order.h"
+#include "common.h"
 // OrderManager class
 class OrderManager
 {

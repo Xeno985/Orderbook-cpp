@@ -13,7 +13,7 @@
         })";
     }
 
-    Authenticator::void send_authcall(client* c, websocketpp::connection_hdl hdl) {
+    void Authenticator::send_authcall(client* c, websocketpp::connection_hdl hdl) {
         websocketpp::lib::error_code ec;
         c->send(hdl, auth_message, websocketpp::frame::opcode::text, ec);
         if (ec) {

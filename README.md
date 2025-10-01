@@ -1,0 +1,1 @@
+╚══[⚡]═▶ g++ -std=c++17 -o trading_app orderbook.cpp \    -I./websocketpp \               # Path to your websocketpp directory    -I./json \      -lboost_system -lboost_thread -lssl -lcrypto -pthread
