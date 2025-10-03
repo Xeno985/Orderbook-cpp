@@ -9,6 +9,7 @@
 
 class GraphUtils{
 public:
+    static ftxui::Element PlotPositionSizes(const std::unordered_map<std::string,double> &positions);
 
     static ftxui::Element PlotLineGraph(const std::vector<double>& data,const std::string& title="",int width=50,int height=10);
 
