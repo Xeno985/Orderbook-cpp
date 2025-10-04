@@ -106,3 +106,28 @@ Element GraphUtils::PlotBarGraph(const std::vector<std::pair<std::string, double
         
                         
 }
+
+
+ftxui::Element GraphUtils::PlotPriceMovement(const std::vector<double>& prices,const std::string& title){
+    if(prices.empty()){
+        return text("No price data available")|center|border;
+    }
+
+    double curr=prices.back();
+    double min_price=FindMin(prices);
+    double max_price=FindMax(prices);
+
+    auto graph=PlotLineGraph(prices,title);
+
+    //now to add some more price info
+
+    return vbox({
+        graph,
+        separator(),
+        hbox({
+            text("Current: $"+std::to_string(static_cast<int>(curr)))|flex(1),
+            text("Min: $"+std::to_string(static_cast<int>(min_price)))|flex(1),
+            text("Max: $"+std::to_string(static_cast<int>(max_price)))| flex(1)
+        })
+    })|border;
+}

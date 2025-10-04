@@ -15,7 +15,7 @@ public:
 
     static ftxui::Element PlotBarGraph(const std::vector<std::pair<std::string,double>>& data,const std::string& title="");
 
-    static ftxui::Element PlotPriceMovement(const std::vector<double>& prices,const std::string& title="");
+    static ftxui::Element PlotPriceMovement(const std::vector<double>& prices,const std::string& title="Price Movement");
 
     static ftxui::Element PlotOrderSizeDistribution(const std::vector<double>& order_sizes);
 
