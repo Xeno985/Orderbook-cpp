@@ -37,5 +37,42 @@ ftxui::Element GraphUtils::PlotLineGraph(const std::vector<double> &data,const s
         if(data.empty()) return {};
 
         std::vector<double> sampled_data;
+
+        if(data.size()<= static_cast<size_t>(graph_width)){
+            sampled_data=data;
+
+        }
+        else{
+            double step=static_cast<double>(data.size())/graph_width;
+            for(int i=0;i<graph_width;++i){
+                size_t index=static_cast<size_t>(i*step);
+                sampled_data.push_back(data[index]);
+            }
+        }
+        return NormalizeData(sampled_data,height);
+    };
+
+    ftxui::Element graph=ftxui::graph(graph_func)|color(ftxui::Color::Cyan);
+
+    if(!title.empty()){
+        return vbox(
+            {
+                text(title)|bold|center,
+                separator(),
+                graph
+            }
+        );
     }
+    return graph;
+}
+
+Element GraphUtils::PlotBarGraph(const std::vector<std::pair<std::string, double>>& data,
+                                const std::string& title){
+
+
+ftxui::Element bars;        
+        
+        
+        
+                        
 }
