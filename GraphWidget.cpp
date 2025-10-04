@@ -70,9 +70,39 @@ Element GraphUtils::PlotBarGraph(const std::vector<std::pair<std::string, double
                                 const std::string& title){
 
 
-ftxui::Element bars;        
+    ftxui::Element bars;        
+    
+    if(!title.empty()){
+        bars.push_back(text(title)|bold|center);
+        bars.push_back(separator());
+    }
+
+    if(data.empty()){
+        bars.push_back(text("No data available")|center);
+        return vbos(bars)|border;
+    }
+
+    double max_val=0;
+    for const auto& pair:data){
+        if(pair.second>max_val) max_val=pair.second;
+    }
+
+    if(max_val==0) max_val=1;
+
+    for(const auto& [label,value]:data){
+        double ratio=value/max_val;
+        bars.push_back(
+            hbox(
+                {
+                    text(label+":")|flex(1),
+                    gauge(ratio)|color(Color::Green)|flex(3),
+                    text(" "+std::to_string(static_cast<int>(value)))|flex(1)
+                }
+            )
+        );
+    }
         
-        
+    return vbox(bars)|border;
         
                         
 }
